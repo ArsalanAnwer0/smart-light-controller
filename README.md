@@ -8,9 +8,9 @@ The Smart Light Controller allows users to toggle a virtual light on/off through
 
 ## Architecture and Workflow
 
-```
+
 ![App Screenshot](./images/architecture.png)
-```
+
 
 ## Project Structure
 
