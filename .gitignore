@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+.venv/
+env/
+venv/
+*.egg-info/
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.qodo
+
+# Terraform - CRITICAL: Add terraform.tfstate to root
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+terraform.tfvars.json
+.terraform.lock.hcl
+
+# Ansible
+*.retry
+ansible.log
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# AWS
+.aws/
+
+# Logs
+logs/
+*.log
+
+# Sensitive files
+*.pem
+*.key
+id_rsa*
+inventory.ini
+
+
+WARP.md

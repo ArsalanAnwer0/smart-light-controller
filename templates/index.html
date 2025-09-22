@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Light Controller</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Smart Light Controller</h1>
+    <p id="status">Light is {{ 'ON' if light else 'OFF' }}</p>
+    <button id="toggle-btn">Toggle Light</button>
+
+    <script>
+        document.getElementById('toggle-btn').addEventListener('click', async () => {
+            const res = await fetch('/toggle', { method: 'POST' });
+            const data = await res.json();
+            document.getElementById('status').textContent = `Light is ${data.light ? 'ON' : 'OFF'}`;
+        });
+    </script>
+</body>
+</html>

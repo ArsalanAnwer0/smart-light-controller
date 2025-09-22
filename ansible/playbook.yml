@@ -1,0 +1,40 @@
+---
+- name: Configure EC2 for Smart Light Controller
+  hosts: all
+  become: true
+
+  vars:
+    docker_image: arsalananwer0/smart-light-controller:latest
+
+  tasks:
+    - name: Install dependencies
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+          - python3-setuptools
+          - python3-venv
+        state: present
+        update_cache: yes
+
+    - name: Install Docker SDK for Python
+      apt:
+        name: python3-docker
+        state: present
+        update_cache: yes
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Run smart-light-controller container
+      docker_container:
+        name: smart-light-controller
+        image: "{{ docker_image }}"
+        state: started
+        recreate: true
+        restart_policy: always
+        published_ports:
+          - "5000:5000"
