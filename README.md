@@ -1,195 +1,261 @@
 # Smart Light Controller
 
+A full-stack DevOps demonstration project that showcases modern cloud deployment practices through a simple Flask web application. This project implements a complete Infrastructure as Code (IaC) pipeline using Docker, Terraform, Ansible, and GitHub Actions.
+
 ## Overview
 
-The Smart Light Controller is a beginner-friendly project that demonstrates how to integrate a simple Flask web application with modern DevOps tools such as Docker, Terraform, Ansible, and GitHub Actions.
+The Smart Light Controller allows users to toggle a virtual light on/off through a web interface. While the application logic is intentionally simple, the project demonstrates enterprise-level DevOps practices including containerization, infrastructure automation, configuration management, and CI/CD pipelines.
 
-The project allows a user to toggle a virtual light on or off through a web interface. While the application logic is simple, the project demonstrates a complete workflow that includes:
+## Architecture and Workflow
 
-- A Flask web application
-- Docker containerization
-- Terraform for provisioning AWS infrastructure
-- Ansible for configuration management and deployment
-- GitHub Actions for continuous integration and continuous deployment (CI/CD)
-
-This project provides a good foundation for understanding how code, infrastructure, and automation work together in real-world DevOps environments.
+```
+![App Screenshot](./images/architecture.png)
+```
 
 ## Project Structure
 
 ```
-.
-├── Dockerfile               # Defines the container image for the Flask app
-├── ansible
-│   └── playbook.yml         # Ansible playbook for configuring EC2 and running Docker
-├── app
-│   ├── __init__.py          # Flask app factory
-│   └── main.py              # Routes and application logic
-├── requirements.txt         # Python dependencies
-├── static
-│   └── style.css            # Stylesheet for the frontend
-├── templates
-│   └── index.html           # HTML template for the web interface
-└── terraform
-    └── main.tf              # Terraform configuration for AWS infrastructure
+smart-light-controller/
+├──  Dockerfile                    # Container definition
+├──  Flask Application
+│   ├── app/
+│   │   ├── __init__.py              # Flask app factory
+│   │   └── main.py                  # Routes and logic
+│   ├── static/style.css             # Frontend styling
+│   ├── templates/index.html         # Web interface
+│   └── requirements.txt             # Python dependencies
+├──  Infrastructure as Code
+│   ├── terraform/main.tf            # AWS infrastructure
+│   └── ansible/playbook.yml        # Server configuration
+├──  CI/CD Pipeline
+│   └── .github/workflows/ci-cd.yml  # GitHub Actions
+└──  Configuration
+    ├── .gitignore                   # Git exclusions
+    ├── .dockerignore               # Docker exclusions
+    └── README.md                   # Documentation
 ```
 
-## Technologies Used
+## Technology Stack
 
-### Flask
-- A lightweight Python web framework
-- Hosts the web application with routes for toggling the light state
+- **Flask**: Lightweight Python web framework
+- **Docker**: Application containerization
+- **Terraform**: Infrastructure provisioning (AWS EC2, Security Groups)
+- **Ansible**: Configuration management and deployment
+- **GitHub Actions**: CI/CD automation
+- **AWS**: Cloud infrastructure (EC2, VPC)
 
-### Docker
-- Packages the application into a container image
-- Ensures consistent runtime environments across local machines and cloud servers
+## Quick Start
 
-### Terraform
-- Automates the provisioning of AWS EC2 instances and security groups
-- Defines infrastructure as code (IaC)
+### Local Development
 
-### Ansible
-- Configures the EC2 instance
-- Installs Docker and runs the application container
+```bash
+# Clone and setup
+git clone https://github.com/ArsalanAnwer0/smart-light-controller.git
+cd smart-light-controller
 
-### GitHub Actions
-- Automates build, testing, and deployment pipelines
-- Integrates Docker, Terraform, and Ansible into a CI/CD workflow
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
 
-## How the Application Works
+# Install and run
+pip install -r requirements.txt
+flask --app app:create_app run
 
-1. The application maintains a variable called `light_state`
-2. When the user clicks the **Toggle Light** button, a request is sent to the server
-3. The server updates `light_state` to the opposite value (ON if it was OFF, and vice versa)
-4. The page updates dynamically to show the new state
-5. The state is stored in memory, which means it resets if the container is restarted
+# Access at http://127.0.0.1:5000
+```
 
-## Running Locally
+### Docker Development
 
-### Prerequisites
-- Python 3.9+
-- Pip (Python package manager)
-- Git
+```bash
+# Build and run container
+docker build -t smart-light-controller .
+docker run -p 5000:5000 smart-light-controller
 
-### Steps
+# Access at http://127.0.0.1:5000
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/<your-username>/smart-light-controller.git
-   cd smart-light-controller
-   ```
-
-2. **Create and activate a virtual environment (recommended):**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate   # On macOS/Linux
-   venv\Scripts\activate      # On Windows
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the application:**
-   ```bash
-   flask --app app:create_app run
-   ```
-
-5. **Open the application in your browser:**
-   ```
-   http://127.0.0.1:5000
-   ```
-
-## Running with Docker
+## AWS Deployment
 
 ### Prerequisites
-- Docker installed on your system
 
-### Steps
-
-1. **Build the Docker image:**
-   ```bash
-   docker build -t smart-light-controller .
-   ```
-
-2. **Run the container:**
-   ```bash
-   docker run -p 5000:5000 smart-light-controller
-   ```
-
-3. **Open the application in your browser:**
-   ```
-   http://127.0.0.1:5000
-   ```
-
-## Deploying to AWS
-
-This project uses Terraform and Ansible to deploy to AWS.
-
-### Prerequisites
-- An AWS account with programmatic access enabled
-- AWS CLI installed and configured (`aws configure`)
+- AWS account with programmatic access
+- AWS CLI configured (`aws configure`)
 - Terraform installed
 - Ansible installed
+- Docker Hub account
+- EC2 Key Pair created
 
-### Steps
+### Deployment Steps
 
-1. **Navigate to the Terraform directory:**
-   ```bash
-   cd terraform
-   ```
+#### 1. Build and Push Container
 
-2. **Initialize Terraform:**
-   ```bash
-   terraform init
-   ```
+```bash
+# Build multi-architecture image
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t your-dockerhub-username/smart-light-controller:latest --push .
+```
 
-3. **Apply Terraform configuration to provision infrastructure:**
-   ```bash
-   terraform apply -auto-approve -var="key_name=your-ec2-keypair"
-   ```
-   > Note the public IP output by Terraform.
+#### 2. Provision Infrastructure
 
-4. **Run the Ansible playbook to configure the instance and deploy the app:**
-   ```bash
-   ansible-playbook -i <public-ip>, ansible/playbook.yml --extra-vars "docker_image=yourusername/smart-light-controller:latest"
-   ```
+```bash
+cd terraform
+terraform init
+terraform apply -var="key_name=your-ec2-keypair"
+# Note the public IP from output
+```
 
-5. **Access the application in your browser:**
-   ```
-   http://<public-ip>:5000
-   ```
+#### 3. Configure and Deploy
 
-## CI/CD with GitHub Actions
+```bash
+# Create inventory file
+echo "[ec2]" > inventory.ini
+echo "YOUR_EC2_PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=path/to/your-key.pem" >> inventory.ini
+
+# Deploy application
+ansible-playbook -i inventory.ini ansible/playbook.yml
+
+# Access at http://YOUR_EC2_PUBLIC_IP:5000
+```
+
+#### 4. Cleanup
+
+```bash
+terraform destroy  # Removes all AWS resources
+```
+
+## CI/CD Pipeline
 
 ### Automated Workflows
 
-**On every push to the main branch:**
-- A Docker image is built and pushed to Docker Hub
+**On Push to Main:**
+- Builds and pushes Docker image to Docker Hub
+- Runs basic validation tests
 
-**On manual trigger or release:**
-- Terraform provisions infrastructure
-- Ansible configures the instance and deploys the application
+**Manual Deployment:**
+- Provisions AWS infrastructure via Terraform
+- Deploys application via Ansible
 
 ### Required GitHub Secrets
 
-Configure the following secrets in your GitHub repository:
+Configure these in your repository settings:
 
-- `DOCKER_USERNAME`
-- `DOCKER_PASSWORD`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_KEY_NAME` (for EC2 key pair)
+```
+DOCKER_USERNAME          # Docker Hub username
+DOCKER_PASSWORD          # Docker Hub password  
+AWS_ACCESS_KEY_ID        # AWS access key
+AWS_SECRET_ACCESS_KEY    # AWS secret key
+AWS_KEY_NAME            # EC2 key pair name
+```
 
-## Limitations
+## Security Considerations
 
- **Important Considerations:**
+### Current Configuration
+- Security group allows HTTP traffic from anywhere (0.0.0.0/0)
+- SSH access restricted to key-based authentication
+- Application runs as non-root user in container
 
-- The light state is stored in memory, so it resets on container restart
-- Security group currently allows traffic from all IPs on port 5000, which is fine for testing but not for production
-- The project is designed for learning purposes.
+### Production Recommendations
+- Restrict security group to specific IP ranges
+- Implement HTTPS with SSL certificates
+- Use AWS IAM roles instead of access keys
+- Enable CloudWatch logging and monitoring
+- Implement proper secret management
 
+## Application Features
+
+- **Light State Management**: Toggle virtual light on/off
+- **Real-time Updates**: Dynamic page updates without refresh
+- **Responsive Design**: Works on desktop and mobile
+- **Container Health**: Automatic restart on failure
+
+## Technical Implementation
+
+### Flask Application
+- RESTful API design with GET/POST endpoints
+- In-memory state storage (resets on restart)
+- Template-based HTML rendering
+- JSON API responses
+
+### Docker Configuration
+- Multi-stage build for optimization
+- Non-root user for security
+- Health check endpoint
+- Minimal Python slim base image
+
+### Infrastructure
+- AWS EC2 t2.micro instance
+- Custom VPC with public subnet
+- Security groups with minimal required access
+- Automated key pair management
+
+## Development Workflow
+
+```bash
+# 1. Make changes locally
+git checkout -b feature-branch
+# ... make changes ...
+
+# 2. Test locally
+docker build -t test-image .
+docker run -p 5000:5000 test-image
+
+# 3. Deploy to development
+git push origin feature-branch
+# GitHub Actions builds and pushes image
+
+# 4. Deploy to AWS
+terraform apply
+ansible-playbook -i inventory.ini ansible/playbook.yml
+
+# 5. Cleanup
+terraform destroy
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**"No matching manifest for linux/amd64"**
+```bash
+# Rebuild with correct architecture
+docker buildx build --platform linux/amd64 -t your-image --push .
+```
+
+**Ansible connection failed**
+```bash
+# Check security group allows SSH (port 22)
+# Verify key file permissions: chmod 400 your-key.pem
+```
+
+**Application not accessible**
+```bash
+# Check security group allows port 5000
+# Verify container is running: docker ps
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test locally and with Docker
+5. Submit a pull request
+
+## Learning Outcomes
+
+This project demonstrates:
+- Infrastructure as Code principles
+- Container orchestration
+- Configuration management
+- CI/CD pipeline design
+- Cloud security basics
+- DevOps tool integration
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+Built as a learning project to demonstrate modern DevOps practices and cloud deployment strategies.
